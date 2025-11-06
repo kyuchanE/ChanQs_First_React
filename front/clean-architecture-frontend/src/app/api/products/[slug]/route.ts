@@ -3,18 +3,17 @@ import { NextRequest } from "next/server";
 
 export const dynamic = "force-static";
 
-type Params = {
-  params: {
-    slug: string;
-  };
+type RouteContext = {
+  params: Promise<{slug: string}>;
 };
 
-export async function GET(_request: NextRequest, { params }: Params) {
-  const product = PRODUCTS.find((item) => item.slug === params.slug);
+export async function GET(_request: NextRequest, { params }: RouteContext) {
+  const { slug } = await params
+  const product = PRODUCTS.find((item) => item.slug === slug);
 
   if (!product) {
     return Response.json(
-      { message: `Product with slug '${params.slug}' not found.` },
+      { message: `Product with slug '${slug}' not found.` },
       { status: 404 },
     );
   }

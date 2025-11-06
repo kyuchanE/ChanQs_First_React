@@ -5,7 +5,7 @@ type CompanyOverviewProps = {
   company: CompanyProfile;
 };
 
-export const CompanyOverview = ({ company }: CompanyOverviewProps) => (
+export const CompanyOverview: React.FC<CompanyOverviewProps> = ({ company }: CompanyOverviewProps) => (
   <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-12 py-16 text-white shadow-xl">
     <div className="relative z-10 grid gap-10 md:grid-cols-[2fr,1fr] md:items-center">
       <div className="space-y-6">
