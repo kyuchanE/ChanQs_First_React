@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -17,7 +17,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
     autoPlayMS = 4000,
     className = "",
     overlay,
-}) => {
+}: HeroCarouselProps) => {
     const [index, setIndex] = useState(0);
     const [paused, setPaused] = useState(false);
     const length = useMemo(() => slides.length, [slides.length]);
@@ -116,7 +116,7 @@ export const HeroCarousel: React.FC<HeroCarouselProps> = ({
                         key={i}
                         aria-label={`Go to slide ${i + 1}`}
                         onClick={() => go(i)}
-                        className={`h-2 w-2 rounded-full transition${i === index ? "bg-white" : "bg-white/50 hover:bg-white/80"}`}
+                        className={`h-2 w-2 rounded-full transition ${i === index ? "bg-black" : "bg-black/50 hover:bg-black/80"}`}
                     />
                 ))}
 
