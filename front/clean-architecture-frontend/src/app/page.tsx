@@ -1,108 +1,321 @@
-import { makeGetCompanyProfileUseCase, makeGetProductsUseCase } from "@/application/factories/useCaseFactory";
-import { CompanyOverview } from "@/presentation/components/CompanyOverview";
-import { ValuesTimeline } from "@/presentation/components/ValuesTimeline";
-import { ProductGrid } from "@/presentation/components/ProductGrid";
-import { HeroCarousel } from "@/presentation/components/HeroCarousel";
-import { CategoryMenu } from "@/presentation/components/CategoryMenu";
+import type { HomeItemDto } from "@/presentation/dtos/bff/homeItemDto";
+import { TopBar } from "@/presentation/components/TopBar";
+import { Footer } from "@/presentation/components/Footer";
+import { HeroSection } from "@/presentation/components/HeroSection";
+import { FadeInSection } from "@/presentation/components/FadeInSection";
+import { resolveApiBaseUrl } from "@/infrastructure/http/axiosClient";
+import { headers } from "next/headers";
 
 export const revalidate = 3600;
 
-export default async function HomePage() {
-  const getCompanyProfileUseCase = await makeGetCompanyProfileUseCase();
-  const company = await getCompanyProfileUseCase.execute();
+const resolveApiUrl = async (path: string): Promise<string> => {
+  const baseUrl = await resolveApiBaseUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
 
-  const getProductsUseCase = await makeGetProductsUseCase();
-  const products = await getProductsUseCase.execute();
+  if (baseUrl.startsWith("http")) {
+    return new URL(normalizedPath, baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`).toString();
+  }
+
+  const headersList = await headers();
+  const protocol = headersList.get("x-forwarded-proto") ?? "http";
+  const host = headersList.get("x-forwarded-host") ?? headersList.get("host");
+
+  if (!host) {
+    return `${baseUrl}${normalizedPath}`;
+  }
+
+  const origin = `${protocol}://${host}`;
+  const normalizedBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  return new URL(`${normalizedBase}${normalizedPath}`, origin).toString();
+};
+
+const fetchHomeItem = async (): Promise<HomeItemDto> => {
+  const apiUrl = await resolveApiUrl("/api/main");
+  const response = await fetch(apiUrl, {
+    next: { revalidate: 3600 },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch home item: ${response.status}`);
+  }
+
+  const returnData = response.json();
+  return returnData;
+};
+
+export default async function HomePage() {
+  const homeItem = await fetchHomeItem();
+  console.log("homeItem!!! >> ", homeItem);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-screen flex-col gap-16 px-6 py-16 md:px-12 md:py-20">
-      <HeroCarousel
-        slides={
-          [
-            { src: "https://live.lge.co.kr/wp-content/uploads/2020/06/AI%EC%9A%A9%EC%96%B4%EC%82%AC%EC%A0%84_00-1-1.jpg", alt: "첫 번째 배너" },
-            { src: "https://cdn.freezinenews.com/news/photo/202411/2223_2819_4941.jpg", alt: "두 번째 배너" },
-            { src: "https://live.lge.co.kr/wp-content/uploads/2020/06/AI%EC%9A%A9%EC%96%B4%EC%82%AC%EC%A0%84_00-1-1.jpg", alt: "세 번째 배너" },
-          ]
-        }
-        autoPlayMS={4500}
-        overlay={{
-          logoSrc: "https://image.ajunews.com/content/image/2022/05/22/20220522133152595561.jpg",
-          title: "ChanQ!!!",
-          subtitle: "SubTitle!!!!!!!!!!!!!"
-        }}
-        className="rounded-2xl"
-      />
+    <main className="relative min-h-screen max-w-screen bg-white">
+      {/* TopBar */}
+      <TopBar title={homeItem.title} />
+      <div id="topbar-sentinel" className="h-0.1 w-full bg-transparent" />
 
-      <CategoryMenu
-        categoryList={[
-          {
-            id: 11,
-            label: "AI",
-            detail: [
-              {
-                id: 0,
-                label: "TTT"
-              },
-              {
-                id: 5,
-                label: "AAAA"
-              },
-              {
-                id: 11,
-                label: "BBGB"
-              },
-            ]
-          },
-          {
-            id: 4,
-            label: "FOOD",
-            detail: [
-              {
-                id: 1,
-                label: "ABCABC"
-              },
-              {
-                id: 9,
-                label: "ZXYYY"
-              },
-              {
-                id: 3,
-                label: "APPLE"
-              },
-            ]
-          },
-          {
-            id: 0,
-            label: "COOL",
-            detail: [
-              {
-                id: 7,
-                label: "123123"
-              },
-              {
-                id: 12,
-                label: "12342434"
-              },
-              {
-                id: 2,
-                label: "555555"
-              },
-            ]
-          },
+      <div className="flex flex-col bg-black">
+        <HeroSection className="md:min-h-screen lg:min-h-[90vh] overflow-y-auto min-w-screen bg-slate-700" />
+        {/* About */}
+        <div className="flex flex-col bg-white pb-20">
+          {/* About Info */}
+          <section className="flex flex-col min-w-screen gap-5 items-center justify-center pt-25">
+            <FadeInSection>
+              <h1>
+                About
+              </h1>
+            </FadeInSection>
+            <FadeInSection className="flex flex-col pt-6 items-center">
+              <p className="w-full text-center">
+                <span className="text-4xl">
+                  <strong>
+                    이 순간만큼
+                  </strong>
+                </span>
+              </p>
+              <p className="w-full text-center">
+                <span className="text-4xl">
+                  <strong>
+                    내 주방이라는 마음으로
+                  </strong>
+                </span>
+              </p>
+              <p className="w-full text-center">
+                <span className="text-4xl">
+                  <strong>
+                    청소합니다.
+                  </strong>
+                </span>
+              </p>
+            </FadeInSection>
+          </section>
+          {/* Box 1 */}
+          <section className="pt-15 px-30">
+            <FadeInSection>
+              <div className="flex flex-col rounded-2xl border border-3 border-slate-200 p-15">
+                <p className="w-full text-center">
+                  <span className="text-4xl">
+                    <strong>
+                      이 순간만큼
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center">
+                  <span className="text-4xl">
+                    <strong>
+                      내 주방이라는 마음으로
+                    </strong>
+                  </span>
+                </p>
+              </div>
+            </FadeInSection>
+          </section>
+          {/* Box 2 */}
+          <section className="pt-15 px-30">
+            <FadeInSection>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="flex flex-col rounded-2xl border border-3 border-slate-200 p-15">
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        이 순간만큼
+                      </strong>
+                    </span>
+                  </p>
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        내 주방이라는 마음으로
+                      </strong>
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-col rounded-2xl border border-3 border-slate-200 p-15">
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        이 순간만큼
+                      </strong>
+                    </span>
+                  </p>
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        내 주방이라는 마음으로
+                      </strong>
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-col rounded-2xl border border-3 border-slate-200 p-15">
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        이 순간만큼
+                      </strong>
+                    </span>
+                  </p>
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        내 주방이라는 마음으로
+                      </strong>
+                    </span>
+                  </p>
+                </div>
+                <div className="flex flex-col rounded-2xl border border-3 border-slate-200 p-15">
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        이 순간만큼
+                      </strong>
+                    </span>
+                  </p>
+                  <p className="w-full text-center">
+                    <span className="text-4xl">
+                      <strong>
+                        내 주방이라는 마음으로
+                      </strong>
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </FadeInSection>
+          </section>
+        </div>
+        {/* Service */}
+        <div className="flex flex-col px-30 pt-20 pb-20 min-w-screen gap-35">
+          {/* Service Info */}
+          <section>
+            <FadeInSection>
+              <h1 className="w-full text-center text-white">
+                Service
+              </h1>
+            </FadeInSection>
+            <FadeInSection className="flex flex-col pt-6 items-center">
+              <p className="w-full text-center">
+                <span className="text-4xl text-white">
+                  <strong>
+                    사장님이 직접,
+                  </strong>
+                </span>
+              </p>
+              <p className="w-full text-center">
+                <span className="text-4xl text-white">
+                  <strong>
+                    처음 약속 그대로!
+                  </strong>
+                </span>
+              </p>
+            </FadeInSection>
+          </section>
+          {/* Service 1 */}
+          <section>
+            <FadeInSection className="flex w-full md:flex-col lg:flex-row items-center justify-center md:gap-10 lg:gap-25">
+              <div className="flex-1 flex-col items-center justify-center">
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      이 순간만큼
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      내 주방이라는 마음으로
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      청소합니다.
+                    </strong>
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://mblogthumb-phinf.pstatic.net/MjAxODAzMTJfMTIx/MDAxNTIwODAwMDkxMzk0.XxxZy31SmHc2uiZ0kC_E-j8ea7lyTNkwImVNoiDhgCEg.NeQXR2HZ53loHcwnnTzGcqLmh7RR4u_X8A_IbogVX1Yg.JPEG.bygani/IMG_7584.jpg?type=w800"
+                alt="test img"
+                className="flex-1 min-w-0 w-full h-[350px] object-cover object-center"
+                loading="lazy"
+              />
+            </FadeInSection>
+          </section>
+          {/* Service 2 */}
+          <section>
+            <FadeInSection className="flex w-full md:flex-col-reverse lg:flex-row items-center justify-center md:gap-10 lg:gap-25">
+              <img
+                src="https://mblogthumb-phinf.pstatic.net/MjAxODAzMTJfMzUg/MDAxNTIwNzk4NDc1NjUx.V9xIzC79Au8t3ztkabzK3muTzWRKwvstLaDFrx1V1lEg.WfTzRZVpqqzYZ29OgL_e6_rT4oq2j7cSF0axHBwOjDsg.JPEG.bygani/IMG_7631.jpg?type=w800"
+                alt="test img"
+                className="flex-1 min-w-0 w-full h-[350px] object-cover object-center"
+                loading="lazy"
+              />
+              <div className="flex-1 flex-col items-center justify-center">
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      이 순간만큼
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      내 주방이라는 마음으로
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      청소합니다.
+                    </strong>
+                  </span>
+                </p>
+              </div>
+            </FadeInSection>
+          </section>
+          {/* Service 3 */}
+          <section>
+            <FadeInSection className="flex md:flex-col lg:flex-row items-center justify-center md:gap-10 lg:gap-25">
+              <div className="flex-1 flex-col items-center justify-center">
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      이 순간만큼
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      내 주방이라는 마음으로
+                    </strong>
+                  </span>
+                </p>
+                <p className="w-full text-center text-white">
+                  <span className="text-4xl">
+                    <strong>
+                      청소합니다.
+                    </strong>
+                  </span>
+                </p>
+              </div>
+              <img
+                src="https://mblogthumb-phinf.pstatic.net/MjAxODAzMTJfMzcg/MDAxNTIwODAwMTM1Mjcw.lFHV-W62mB0rj_7qMivXVo-D17RfvV9uJEvQLV233n0g.MpX281AQa9gmyHKaaPzaPpJ9XBNH2HhtXk1_bV0c__Eg.JPEG.bygani/IMG_7585.jpg?type=w800"
+                alt="test img"
+                className="flex-1 min-w-0 w-full h-[350px] object-cover object-center"
+                loading="lazy"
+              />
+            </FadeInSection>
+          </section>
+        </div>
 
-        ]}
-        suggestItemList={[
-          { id: 0, title: "TextItem1", subTitle: "SubTitle!!!!!", itemImg: "https://i.namu.wiki/i/DIWQPMFg_xE7JxIv0-4M5PbXco2d-BynsivSWqt6enqDgXOKw0nuZznBUGV-7FtJilQEY7zxodg1kZcYlQXDJw.webp", prc: 5000 },
-          { id: 1, title: "TextItem2", subTitle: "SubTitle!!!!!@@@@", itemImg: "https://image.edaily.co.kr/images/Photo/files/NP/S/2024/11/PS24110300173.jpg", prc: 23000 },
-          { id: 2, title: "TextItem3", subTitle: "SubTitle!!!!!$$$", itemImg: "https://img1.newsis.com/2019/04/25/NISI20190425_0000315819_web.jpg", prc: 5500 },
-          { id: 3, title: "TextItem4", subTitle: "SubTitle!!!!!#####", itemImg: "https://i.pinimg.com/236x/76/a8/39/76a839c8f78ab9eda625157d6b7c566b.jpg", prc: 102000 },
-        ]}
-      // onSelect={(id) => console.log("click:", id)}
-      />
+        <div className="flex h-[250px] w-full bg-white p-10">
 
-      {/* <CompanyOverview company={company} />
-      <ValuesTimeline company={company} />
-      <ProductGrid products={products} /> */}
+        </div>
+      </div>
+
     </main>
   );
 }

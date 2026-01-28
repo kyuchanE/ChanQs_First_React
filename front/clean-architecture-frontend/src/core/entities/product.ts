@@ -1,19 +1,12 @@
-export type ProductFeature = {
-  title: string;
-  description: string;
-};
-
-export type Product = {
-  id: string;
-  slug: string;
+export type ProductType = {
+  id: number;
   name: string;
   summary: string;
+  tag: string[];
   description: string;
   category: string;
-  heroImage: string;
-  price: string;
-  highlights: string[];
-  features: ProductFeature[];
+  imageUrl: string;
+  price: number;
   seoTitle: string;
   seoDescription: string;
 };

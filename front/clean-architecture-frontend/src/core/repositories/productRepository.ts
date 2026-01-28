@@ -1,6 +1,6 @@
-import { Product } from "@/core/entities/product";
+import { ProductType } from "@/core/entities/product";
 
 export interface ProductRepository {
-  getProducts(): Promise<Product[]>;
-  getProductBySlug(slug: string): Promise<Product | undefined>;
+  getProducts(): Promise<ProductType[]>;
+  getProductBySlug(slug: string): Promise<ProductType | undefined>;
 }

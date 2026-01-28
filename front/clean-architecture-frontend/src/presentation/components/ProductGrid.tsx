@@ -1,8 +1,8 @@
-import { Product } from "@/core/entities/product";
+import { ProductType } from "@/core/entities/product";
 import Link from "next/link";
 
 type ProductGridProps = {
-  products: Product[];
+  products: ProductType[];
 };
 
 const categoryGradients: Record<string, string> = {

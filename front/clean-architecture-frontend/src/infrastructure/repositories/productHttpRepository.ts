@@ -1,24 +1,26 @@
 import axios, { AxiosInstance } from "axios";
 import { ProductRepository } from "@/core/repositories/productRepository";
-import { Product } from "@/core/entities/product";
+import { ProductType } from "@/core/entities/product";
+import { ProductItem } from "../dtos/remote/product";
+import { mapperProduct, mapperProductList } from "../mappers/productMapper";
 
-type ProductListResponse = Product[];
-type ProductDetailResponse = Product;
+type ProductListResponse = ProductItem[];
+type ProductDetailResponse = ProductItem;
 
 export class ProductHttpRepository implements ProductRepository {
-  constructor(private readonly client: AxiosInstance) {}
+  constructor(private readonly client: AxiosInstance) { }
 
-  async getProducts(): Promise<Product[]> {
+  async getProducts(): Promise<ProductType[]> {
     const { data } = await this.client.get<ProductListResponse>("/products");
-    return data;
+    return mapperProductList(data);
   }
 
-  async getProductBySlug(slug: string): Promise<Product | undefined> {
+  async getProductBySlug(id: string): Promise<ProductType | undefined> {
     try {
       const { data } = await this.client.get<ProductDetailResponse>(
-        `/products/${slug}`,
+        `/products/${id}`,
       );
-      return data;
+      return mapperProduct(data);
     } catch (error: unknown) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         return undefined;
@@ -27,4 +29,5 @@ export class ProductHttpRepository implements ProductRepository {
       throw error;
     }
   }
+
 }

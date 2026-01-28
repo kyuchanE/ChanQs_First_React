@@ -1,10 +1,10 @@
 import { ProductRepository } from "@/core/repositories/productRepository";
-import { Product } from "@/core/entities/product";
+import { ProductType } from "@/core/entities/product";
 
 export class GetProductsUseCase {
-  constructor(private readonly repository: ProductRepository) {}
+  constructor(private readonly repository: ProductRepository) { }
 
-  execute(): Promise<Product[]> {
+  execute(): Promise<ProductType[]> {
     return this.repository.getProducts();
   }
 }

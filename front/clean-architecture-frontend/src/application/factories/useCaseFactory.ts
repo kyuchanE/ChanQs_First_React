@@ -1,15 +1,9 @@
 import { createAxiosClient } from "@/infrastructure/http/axiosClient";
-import { CompanyHttpRepository } from "@/infrastructure/repositories/companyHttpRepository";
 import { ProductHttpRepository } from "@/infrastructure/repositories/productHttpRepository";
-import { GetCompanyProfileUseCase } from "@/application/use-cases/getCompanyProfile";
 import { GetProductsUseCase } from "@/application/use-cases/getProducts";
 import { GetProductBySlugUseCase } from "@/application/use-cases/getProductBySlug";
-
-export const makeGetCompanyProfileUseCase = async (): Promise<GetCompanyProfileUseCase> => {
-  const client = await createAxiosClient();
-  const repository = new CompanyHttpRepository(client);
-  return new GetCompanyProfileUseCase(repository);
-};
+import { GetHomeItemUseCase } from "../use-cases/getHomeItem";
+import { HomeItemHttpRepository } from "@/infrastructure/repositories/homeItemHttpRepository";
 
 export const makeGetProductsUseCase = async (): Promise<GetProductsUseCase> => {
   const client = await createAxiosClient();
@@ -22,3 +16,9 @@ export const makeGetProductBySlugUseCase = async (): Promise<GetProductBySlugUse
   const repository = new ProductHttpRepository(client);
   return new GetProductBySlugUseCase(repository);
 };
+
+export const makeGetHomeItemUseCase = async (): Promise<GetHomeItemUseCase> => {
+  const client = await createAxiosClient();
+  const repository = new HomeItemHttpRepository(client);
+  return new GetHomeItemUseCase(repository);
+}
