@@ -6,11 +6,7 @@ import logo from '../../../public/next.svg'
 import { useRouter } from "next/navigation";
 
 
-type TopBarProps = {
-    title?: string;
-};
-
-export const TopBar: React.FC<TopBarProps> = ({ title = "Test TopBar" }) => {
+export const TopBar: React.FC = () => {
     const router = useRouter();
     const [isAtTop, setIsAtTop] = useState<boolean>(true);
 
@@ -56,7 +52,7 @@ export const TopBar: React.FC<TopBarProps> = ({ title = "Test TopBar" }) => {
                     </button>
 
                     <h1 className="text-4xl font-semibold text-white">
-                        {title}
+                        TopBar Title
                     </h1>
                 </div>
 

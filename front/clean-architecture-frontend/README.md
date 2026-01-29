@@ -1,6 +1,7 @@
 ## ChanQ Digital Frontend
 
 Node.js + React SSR marketing site for ChanQ Digital, scaffolded with Next.js 14 (App Router) and organised using a lightweight Clean Architecture layout. Axios powers REST communication with the internal API routes, enabling a clear separation between domain use cases and infrastructure concerns.
+State management is split: React Query for server state, Zustand for client state.
 
 ### Getting Started
 
@@ -19,16 +20,15 @@ The application runs on `http://localhost:3000`. Product detail pages are static
 - `src/presentation` – UI components consumed by the App Router
 - `src/app` – Next.js app directory with server components, SEO metadata, and REST API handlers
 
+### State Management
+
+- Server state: React Query
+- Client state: Zustand
+
 ### API Configuration
 
-Axios instances resolve the API base URL in the following order:
-
-1. `API_BASE_URL`
-2. `NEXT_PUBLIC_API_BASE_URL`
-3. Host headers (during SSR)
-4. `/api` (client-side fallback)
-
-When deploying behind a custom domain, set `API_BASE_URL` to the fully qualified origin that exposes the `/api` routes.
+`src/infrastructure/http/axiosClient.ts`는 외부 API 전용으로 사용합니다.
+외부 API 기본 URL은 `EXTERNAL_API_BASE_URL`에서만 읽습니다.
 
 ### Available Scripts
 

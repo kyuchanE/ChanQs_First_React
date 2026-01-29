@@ -14,6 +14,7 @@
 - `src/application/use-cases` — business use cases. Pure orchestration of domain rules.
 - `src/application/factories` — wiring for repositories/use-cases.
 - `src/infrastructure/http/clients` — Axios/fetch clients for external REST APIs.
+- `src/infrastructure/http/axiosClient.ts` — external API 전용 Axios client (BFF 호출 금지).
 - `src/infrastructure/dtos/remote` — Remote DTOs matching external API schemas.
 - `src/infrastructure/validators` — input/response validation (zod, etc.).
 - `src/infrastructure/mappers` — Remote DTO → Domain mapping.
@@ -46,6 +47,7 @@
 - TypeScript (`.ts`/`.tsx`) only; keep React components functional.
 - Use PascalCase for React components (`CompanyOverview`), camelCase for helpers (`resolveApiBaseUrl`), and SCREAMING_CASE for constants (`DEFAULT_API_PATH`).
 - Tailwind CSS drives styling; prefer utility classes over inline styles.
+- State management split: React Query for server state, Zustand for client state.
 - Run `npm run lint` before pushing.
 
 ## Testing Guidelines
