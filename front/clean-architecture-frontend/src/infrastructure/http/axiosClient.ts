@@ -66,8 +66,51 @@ export const resolveApiBaseUrl = async (): Promise<string> => {
   return headerUrl ?? DEFAULT_API_PATH;
 };
 
+// BFF 전용: Next.js 내부 API(`/api`)를 호출하기 위한 URL을 만든다.
+export const resolveApiUrl = async (path: string): Promise<string> => {
+  const baseUrl = await resolveApiBaseUrl();
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (baseUrl.startsWith("http")) {
+    return new URL(
+      normalizedPath,
+      baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`,
+    ).toString();
+  }
+
+  const headersList = await headers();
+  const protocol = headersList.get("x-forwarded-proto") ?? "http";
+  const host = headersList.get("x-forwarded-host") ?? headersList.get("host");
+
+  if (!host) {
+    return `${baseUrl}${normalizedPath}`;
+  }
+
+  const origin = `${protocol}://${host}`;
+  const normalizedBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
+  return new URL(`${normalizedBase}${normalizedPath}`, origin).toString();
+};
+
+export const resolveExternalApiUrl = (path: string): string => {
+  const baseUrl = process.env.EXTERNAL_API_BASE_URL ?? "";
+
+  if (!baseUrl) {
+    throw new Error("EXTERNAL_API_BASE_URL is not defined.");
+  }
+
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const normalizedBase = normalizeUrl(baseUrl);
+  const absoluteBase = normalizedBase.startsWith("http")
+    ? normalizedBase
+    : normalizedBase.startsWith("/")
+      ? normalizedBase
+      : `https://${normalizedBase}`;
+
+  return new URL(normalizedPath, absoluteBase.endsWith("/") ? absoluteBase : `${absoluteBase}/`).toString();
+};
+
 export const createAxiosClient = async (): Promise<AxiosInstance> => {
-  const baseURL = await resolveApiBaseUrl();
+  const baseURL = resolveExternalApiUrl("/");
   return axios.create({
     baseURL,
     headers: {

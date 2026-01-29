@@ -3,31 +3,7 @@ import { TopBar } from "@/presentation/components/TopBar";
 import { Footer } from "@/presentation/components/Footer";
 import { HeroSection } from "@/presentation/components/HeroSection";
 import { FadeInSection } from "@/presentation/components/FadeInSection";
-import { resolveApiBaseUrl } from "@/infrastructure/http/axiosClient";
-import { headers } from "next/headers";
-
-export const revalidate = 3600;
-
-const resolveApiUrl = async (path: string): Promise<string> => {
-  const baseUrl = await resolveApiBaseUrl();
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
-
-  if (baseUrl.startsWith("http")) {
-    return new URL(normalizedPath, baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`).toString();
-  }
-
-  const headersList = await headers();
-  const protocol = headersList.get("x-forwarded-proto") ?? "http";
-  const host = headersList.get("x-forwarded-host") ?? headersList.get("host");
-
-  if (!host) {
-    return `${baseUrl}${normalizedPath}`;
-  }
-
-  const origin = `${protocol}://${host}`;
-  const normalizedBase = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
-  return new URL(`${normalizedBase}${normalizedPath}`, origin).toString();
-};
+import { resolveApiUrl } from "@/infrastructure/http/axiosClient";
 
 const fetchHomeItem = async (): Promise<HomeItemDto> => {
   const apiUrl = await resolveApiUrl("/api/main");
