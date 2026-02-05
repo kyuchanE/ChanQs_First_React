@@ -1,9 +1,13 @@
 import { Router } from 'express';
 
-import { getProducts } from '../controllers/product.controller.js';
+import type { ProductRepository } from '../../../domain/repositories/product-repository.js';
+import { createProductController } from '../controllers/product.controller.js';
 
-const productRouter = Router();
+export const createProductRouter = (repo: ProductRepository) => {
+  const productRouter = Router();
+  const { getProducts } = createProductController(repo);
 
-productRouter.get('/', getProducts);
+  productRouter.get('/', getProducts);
 
-export { productRouter };
+  return productRouter;
+};

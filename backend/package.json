@@ -5,20 +5,21 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/server.ts",
-    "build": "tsc --project tsconfig.json",
-    "start": "node dist/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_ENV=development tsx src/server.ts",
+    "build": "NODE_ENV=production tsc --project tsconfig.json",
+    "start": "NODE_ENV=production node dist/server.js",
+    "test": "NODE_ENV=test echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
+    "dotenv-flow": "^4.0.0",
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "morgan": "^1.10.1",
+    "pg": "^8.17.2",
     "zod": "^4.1.12"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@types/express": "^5.0.4",
     "@types/morgan": "^1.9.10",
     "@types/node": "^22.10.1",
+    "@types/pg": "^8.16.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.38.0",

@@ -1,1 +1,1 @@
-// Domain repository interfaces live here.
+export * from './product-repository.js';

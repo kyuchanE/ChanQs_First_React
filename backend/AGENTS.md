@@ -1,8 +1,11 @@
 # Repository Guidelines
 
 ## Goal
-- 상품 리스트 + 상품 상세 정보 제공
-- 기업 소개 (연락처, 서비스 소개, 서비스 가능 지역)
+- Node + Express 기반 REST API 서버 구축
+- PostgreSQL 연동
+- Docker 컨테이너 배포
+- Clean Architecture 구조 사용
+- 서비스 소개 데이터 제공 API 및 관리자(백오피스) API 구축
 
 ## Project Structure & Module Organization
 - Core TypeScript source lives in `src/`, organized with a clean architecture split:
@@ -11,7 +14,18 @@
   - `src/domain` for entities and repository contracts.
   - `src/infrastructure/http` for Express adapters (controllers, routes, middleware).
   - `src/server.ts` bootstraps the HTTP server; `src/app.ts` wires middleware and routes.
-- Compile output is emitted to `dist/` via the TypeScript build. Create new tests under `tests/` (to be added) mirroring the module layout.
+- Compile output is emitted to `dist/` via the TypeScript build.
+- Create new tests under `tests/` mirroring the module layout.
+
+## Directory Responsibilities
+- `src/config`: environment variables and app-wide configuration.
+- `src/application`: use cases and application orchestration logic.
+- `src/domain`: entities and repository contracts.
+- `src/infrastructure/http`: Express adapters (controllers, routes, middleware).
+- `src/app.ts`: middleware and routing composition.
+- `src/server.ts`: HTTP server bootstrap.
+- `dist`: compiled output.
+- `tests`: test suite (to be added).
 
 ## Build, Test, and Development Commands
 - `npm run dev` — start the Express server in watch mode through `tsx src/server.ts`.

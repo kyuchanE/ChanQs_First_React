@@ -1,11 +1,18 @@
 import { Router } from 'express';
 
+import type { ProductRepository } from '../../../domain/repositories/product-repository.js';
 import { healthRouter } from './health.route.js';
-import { productRouter } from './product.route.js';
+import { createProductRouter } from './product.route.js';
 
-const router = Router();
+export type ApiRouterDependencies = {
+  productRepository: ProductRepository;
+};
 
-router.use('/health', healthRouter);
-router.use('/products', productRouter);
+export const createApiRouter = (deps: ApiRouterDependencies) => {
+  const router = Router();
 
-export { router };
+  router.use('/health', healthRouter);
+  router.use('/products', createProductRouter(deps.productRepository));
+
+  return router;
+};

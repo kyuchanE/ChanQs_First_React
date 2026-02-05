@@ -1,28 +1,42 @@
-import { config } from 'dotenv';
+import dotenvFlow from 'dotenv-flow';
 import { z } from 'zod';
 
-const DEFAULT_ENV_FILE = '.env';
-const ENV_FILE = process.env.NODE_ENV
-  ? `.env.${process.env.NODE_ENV}`
-  : DEFAULT_ENV_FILE;
+dotenvFlow.config();
 
-config({
-  path: DEFAULT_ENV_FILE,
-});
+const envSchema = z
+  .object({
+    NODE_ENV: z
+      .enum(['development', 'test', 'production'])
+      .default('development'),
+    PORT: z.coerce.number().int().positive().default(3000),
+    DATABASE_URL: z.string().url().optional(),
+    PGHOST: z.string().optional(),
+    PGPORT: z.coerce.number().int().positive().optional(),
+    PGUSER: z.string().optional(),
+    PGPASSWORD: z.string().optional(),
+    PGDATABASE: z.string().optional(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.NODE_ENV !== 'production') {
+      return;
+    }
 
-if (ENV_FILE !== DEFAULT_ENV_FILE) {
-  config({
-    path: ENV_FILE,
-    override: true,
+    const hasDatabaseUrl = Boolean(values.DATABASE_URL);
+    const hasPgConfig =
+      Boolean(values.PGHOST) &&
+      values.PGPORT !== undefined &&
+      Boolean(values.PGUSER) &&
+      Boolean(values.PGPASSWORD) &&
+      Boolean(values.PGDATABASE);
+
+    if (!hasDatabaseUrl && !hasPgConfig) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['DATABASE_URL'],
+        message: 'Production requires DATABASE_URL or PG* connection values.',
+      });
+    }
   });
-}
-
-const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
-  PORT: z.coerce.number().int().positive().default(3000),
-});
 
 const parsedEnv = envSchema.safeParse(process.env);
 
