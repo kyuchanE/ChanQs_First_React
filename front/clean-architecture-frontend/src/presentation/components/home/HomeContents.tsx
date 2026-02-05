@@ -33,7 +33,7 @@ export const HomeContents: React.FC = () => {
 
     return (
         <div className="flex flex-col bg-black">
-            <HeroSection className="md:min-h-screen lg:min-h-[90vh] overflow-y-auto min-w-screen bg-slate-700" />
+            <HeroSection className="md:min-h-screen lg:min-h-[90vh] min-w-screen bg-slate-700" />
             {/* About */}
             <div className="flex flex-col bg-white pb-20">
                 {/* About Info */}
